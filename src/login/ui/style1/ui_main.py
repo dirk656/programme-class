@@ -252,13 +252,24 @@ class CheckInPage(QWidget):
 
         save_name = f"{username}_{name}"
 
-        self.stop_camera()
-        self.camera_thread = CameraThread(mode="register", name=save_name)
-        self.camera_thread.frame_ready.connect(self.update_camera_frame)
-        self.camera_thread.register_done.connect(self.handle_register_done)
-        self.camera_thread.start()
-        self.start_checkin_btn.setEnabled(False)
-        self.register_btn.setEnabled(False)
+        # Import here to avoid changing startup import paths.
+        from pathlib import Path
+
+        src_root = Path(__file__).resolve().parents[3]
+        recognition_root = str(src_root)
+        if recognition_root not in sys.path:
+            sys.path.append(recognition_root)
+
+        try:
+            from recognition.record_face import record_face
+
+            saved = record_face(save_name, save_root=src_root.parent / "data" / "known_faces", max_samples=3)
+            if saved > 0:
+                QMessageBox.information(self, "录入成功", f"{save_name} 录入完成，共保存 {saved} 张人脸图像")
+            else:
+                QMessageBox.warning(self, "录入失败", "未保存到人脸图像，请重试")
+        except Exception as e:
+            QMessageBox.critical(self, "录入异常", f"人脸录入失败: {e}")
 
     def stop_camera(self):
         try:
