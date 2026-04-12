@@ -1,2 +1,7 @@
-numpy==2.0.2
-opencv-contrib-python==4.13.0.92
+opencv-python
+opencv-contrib-python
+face-recognition
+dlib
+PyQt5
+pillow
+numpy

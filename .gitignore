@@ -1,4 +1,24 @@
-/data
-/report
+# IDE
+.idea/
+.vscode/
+
+# Python cache
+__pycache__/
 *.pyc
-*.jpg
+*.pyo
+*.pyd
+
+# System
+.DS_Store
+Thumbs.db
+
+# Temp
+img_temp/
+
+# Env
+venv/
+env/
+
+# Log
+*.log
+*.tmp
