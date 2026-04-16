@@ -1,5 +1,5 @@
 # manager/ui_manager.py
-from ui.factory.factory import UIFactory
+from src.login.ui.factory.factory import UIFactory
 
 class UIManager:
     _instance = None

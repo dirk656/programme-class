@@ -1,18 +1,21 @@
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QIcon
-from config.settings import ICON_PATH
-from ui.base.base_windows import BaseLoginWindow
-from core.auth_manager import AuthManager
-from ui.render.login_render import LoginRender
+from src.login.ui.base.base_windows import BaseLoginWindow
+from src.login.core.auth_manager import AuthManager
+from src.login.ui.factory.factory import UIFactory
 
 class LoginWindow(QMainWindow, BaseLoginWindow):
     login_success = pyqtSignal(str, str)
 
-    def __init__(self):
+    def __init__(self, render_class=None):
         super().__init__()
         self._init_base_config()
-        self.render = LoginRender(self)
+
+        # 自动获取皮肤
+        if render_class is None:
+            render_class = UIFactory.get_login_render()
+        
+        self.render = render_class(self)
         self.render.build()
         self.render.bind_events(
             self.on_login_click,
@@ -25,7 +28,6 @@ class LoginWindow(QMainWindow, BaseLoginWindow):
         self.setGeometry(600, 250, 800, 600)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setWindowIcon(QIcon(ICON_PATH))
 
     def on_login_click(self):
         username = self.render.username_input.text().strip()
@@ -34,7 +36,7 @@ class LoginWindow(QMainWindow, BaseLoginWindow):
 
         if success:
             QMessageBox.information(None, "成功", msg)
-            self.login_success.emit(username, role)  # 只发信号，不关窗口！
+            self.login_success.emit(username, role)
         else:
             QMessageBox.warning(self, "失败", msg)
 
@@ -43,6 +45,6 @@ class LoginWindow(QMainWindow, BaseLoginWindow):
         self.render.password_input.clear()
 
     def open_register_window(self):
-        from ui.style1.register_window import RegisterWindow
+        from src.login.ui.style1.register_window import RegisterWindow
         self.reg_win = RegisterWindow()
         self.reg_win.show()

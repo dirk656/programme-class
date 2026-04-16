@@ -17,9 +17,6 @@ class CameraThread(QThread):
         self.running = False
         self.capture = None
         self.register_count = 0
-        self.frame_index = 0
-        self.recognize_interval = 3
-        self.register_interval = 10
 
     #摄像头运行函数
     def run(self):
@@ -38,21 +35,15 @@ class CameraThread(QThread):
             if not ret:
                 break
 
-            self.frame_index += 1
-
             self.frame_ready.emit(frame)
 
             if self.mode == "checkin":
-                if self.frame_index % self.recognize_interval != 0:
-                    continue
                 name = face_engine.recognize_face(frame)
                 if name:
                     self.recognize_result.emit(name)
 
             elif self.mode == "register":
                 if self.register_count < 3:
-                    if self.frame_index % self.register_interval != 0:
-                        continue
                     if face_engine.save_face(self.name, frame):
                         self.register_count += 1
 

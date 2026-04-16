@@ -2,7 +2,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
-from manager.window_manager import WindowManager
+from src.login.manager.window_manager import WindowManager
 
 if __name__ == "__main__":
     
