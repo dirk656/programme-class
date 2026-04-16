@@ -25,3 +25,12 @@ env/
 *.tmp
 
 .venv/
+
+.pytest_cache/
+.mypy_cache/
+.vscode/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.png 
