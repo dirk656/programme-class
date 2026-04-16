@@ -9,43 +9,21 @@ import cv2
 import face_recognition
 import numpy as np
 
+from recognition.load_faces_data import load_faces_data 
 KNOWN_DIR = Path("data/known_faces")
 FRAME_SCALE = 0.25
 TOLERANCE = 0.5
 SUPPORTED_EXTS = {".jpg", ".jpeg", ".png", ".bmp"}
 
 
-def load_known_faces(known_dir: Path) -> Tuple[List[np.ndarray], List[str]]:
-
-    encodings: List[np.ndarray] = []
-    names: List[str] = []
-
-    if not known_dir.exists() or not known_dir.is_dir():
-        return encodings, names
-
-    for image_path in sorted(known_dir.glob("*")):
-        if image_path.suffix.lower() not in SUPPORTED_EXTS:
-            continue
-
-        image = face_recognition.load_image_file(str(image_path))
-        face_encs = face_recognition.face_encodings(image)
-        if not face_encs:
-            continue
-
-        # Use the first detected face in each known image.
-        encodings.append(face_encs[0])
-        names.append(image_path.stem)
-
-    return encodings, names
-
-
-def camera_face_match() -> None:
-    known_encodings, known_names = load_known_faces(KNOWN_DIR)
+def camera_face_match(known_encodings, known_names) -> None:
+   
     if not known_encodings:
         print(f"No known faces loaded from: {KNOWN_DIR}")
         sys.exit(1)
 
     cap = cv2.VideoCapture(0)
+
     if not cap.isOpened():
         print("Failed to open camera")
         sys.exit(1)
@@ -84,15 +62,7 @@ def camera_face_match() -> None:
 
                 cv2.rectangle(frame, (left, top), (right, bottom), (0, 200, 0), 2)
                 cv2.rectangle(frame, (left, bottom - 28), (right, bottom), (0, 200, 0), cv2.FILLED)
-                cv2.putText(
-                    frame,
-                    f"{name} {score_text}",
-                    (left + 6, bottom - 8),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.55,
-                    (255, 255, 255),
-                    1,
-                )
+            
 
             cv2.imshow("Camera Face Match", frame)
             if cv2.waitKey(1) & 0xFF == ord("q"):

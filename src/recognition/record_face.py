@@ -7,7 +7,7 @@ import cv2
 CASCADE_FILE = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
 
 
-def record_face(person_name: str,save_root: Optional[Union[str, Path]] = None,max_samples: int = 3,) -> int:
+def record_face(person_name: str,save_root: Optional[Union[str, Path]] = None,max_samples: int = 1,) -> int:
  
 
     ###safe_name = person_name.strip().replace(" ", "_")

@@ -200,7 +200,8 @@ class CheckInPage(QWidget):
         bytes_per_line = ch * w
         # BGR → RGB
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        qt_image = QImage(rgb_frame.data, w, h, bytes_per_line, QImage.Format_RGB888)
+        # 注意：此处用 copy() 防止 C++ 层面的数据被 Python 垃圾回收导致崩溃或黑屏
+        qt_image = QImage(rgb_frame.data, w, h, bytes_per_line, QImage.Format_RGB888).copy()
         pixmap = QPixmap.fromImage(qt_image)
         scaled_pixmap = pixmap.scaled(self.camera_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.camera_label.setPixmap(scaled_pixmap)
@@ -212,7 +213,7 @@ class CheckInPage(QWidget):
         try:
             # 格式解析 统一放这里
             if "_" in name:
-                student_username, real_name = name.split("_", 1)
+                real_name, student_username = name.split("_", 1)
             else:
                 student_username = name
                 real_name = name
@@ -228,7 +229,7 @@ class CheckInPage(QWidget):
             print(f"[UI] 识别异常：{e}")
 
     def handle_register_done(self, name):
-        QMessageBox.information(self, "录入成功", f"{name}的人脸数据已录入3张！\n可进行签到识别")
+        QMessageBox.information(self, "录入成功", f"{name}的人脸数据已录入1张！\n可进行签到识别")
         self.stop_camera()
         self.start_checkin_btn.setEnabled(True)
         self.register_btn.setEnabled(True)
@@ -250,26 +251,16 @@ class CheckInPage(QWidget):
             QMessageBox.warning(self, "提示", "请输入【学生账号】和【学生姓名】！")
             return
 
-        save_name = f"{username}_{name}"
+        save_name = f"{name}_{username}"
 
-        # Import here to avoid changing startup import paths.
-        from pathlib import Path
+        self.stop_camera()
+        self.camera_thread = CameraThread(mode="register", name=save_name)
+        self.camera_thread.frame_ready.connect(self.update_camera_frame)
+        self.camera_thread.register_done.connect(self.handle_register_done)
+        self.camera_thread.start()
 
-        src_root = Path(__file__).resolve().parents[3]
-        recognition_root = str(src_root)
-        if recognition_root not in sys.path:
-            sys.path.append(recognition_root)
-
-        try:
-            from recognition.record_face import record_face
-
-            saved = record_face(save_name, save_root=src_root.parent / "data" / "known_faces", max_samples=3)
-            if saved > 0:
-                QMessageBox.information(self, "录入成功", f"{save_name} 录入完成，共保存 {saved} 张人脸图像")
-            else:
-                QMessageBox.warning(self, "录入失败", "未保存到人脸图像，请重试")
-        except Exception as e:
-            QMessageBox.critical(self, "录入异常", f"人脸录入失败: {e}")
+        self.start_checkin_btn.setEnabled(False)
+        self.register_btn.setEnabled(False)
 
     def stop_camera(self):
         try:
