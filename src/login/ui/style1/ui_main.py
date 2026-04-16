@@ -63,6 +63,7 @@ class CheckInPage(QWidget):
         except: pass
 
     def handle_register_done(self, name):
+        ui = self.ui
         QMessageBox.information(self, "录入成功", f"{name}的人脸数据已录入1张！\n可进行签到识别")
         self.stop_camera()
         ui.start_checkin_btn.setEnabled(True)
@@ -94,8 +95,8 @@ class CheckInPage(QWidget):
         self.camera_thread.register_done.connect(self.handle_register_done)
         self.camera_thread.start()
 
-        self.start_checkin_btn.setEnabled(False)
-        self.register_btn.setEnabled(False)
+        ui.start_checkin_btn.setEnabled(False)
+        ui.register_btn.setEnabled(False)
 
     def stop_camera(self):
         ui = self.ui

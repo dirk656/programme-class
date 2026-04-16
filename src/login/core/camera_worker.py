@@ -5,8 +5,6 @@ import numpy as np
 from PyQt5.QtCore import QThread, pyqtSignal
 from . import face_engine
 
-from recognition.open_camera import open_camera
-
 class CameraThread(QThread):
     frame_ready = pyqtSignal(np.ndarray)
     recognize_result = pyqtSignal(str)
@@ -19,6 +17,9 @@ class CameraThread(QThread):
         self.running = False
         self.capture = None
         self.register_count = 0
+        self.frame_index = 0
+        self.recognize_interval = 3
+        self.register_interval = 10
 
     #摄像头运行函数
     def run(self):

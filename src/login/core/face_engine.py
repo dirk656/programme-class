@@ -11,9 +11,8 @@ sys.path.append(str(Path(__file__).resolve().parents[2]))
 from recognition.load_faces_data import load_faces_data
 
 # 人脸库路径
-USER_FACE_DIR = "img_user"
-if not os.path.exists(USER_FACE_DIR):
-    os.makedirs(USER_FACE_DIR)
+USER_FACE_DIR = Path(__file__).resolve().parents[3] / "data" / "known_faces"
+USER_FACE_DIR.mkdir(parents=True, exist_ok=True)
 
 known_encodings = []
 known_names = []

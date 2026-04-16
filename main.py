@@ -5,10 +5,10 @@ from PyQt5.QtCore import Qt
 from src.login.manager.window_manager import WindowManager
 
 if __name__ == "__main__":
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
     
     app = QApplication(sys.argv)
-    app.setAttribute(Qt.AA_UseHighDpiPixmaps)
-    app.setAttribute(Qt.AA_EnableHighDpiScaling)
 
     # 全局窗口管理器
     wm = WindowManager(app)
