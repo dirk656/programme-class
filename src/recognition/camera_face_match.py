@@ -101,6 +101,6 @@ def camera_face_match() -> None:
         cap.release()
         cv2.destroyAllWindows()
 
-dirk656/RoboAutoTask
+
 if __name__ == "__main__":
     camera_face_match()

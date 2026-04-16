@@ -14,6 +14,7 @@ Thumbs.db
 
 # Temp
 img_temp/
+img_user/
 
 # Env
 venv/
@@ -22,3 +23,5 @@ env/
 # Log
 *.log
 *.tmp
+
+.venv/
