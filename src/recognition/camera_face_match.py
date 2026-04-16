@@ -1,13 +1,3 @@
-"""Realtime camera face matching script.
-
-This script does not modify any existing project files.
-It loads known faces from data/known_faces and matches faces from webcam.
-
-Usage:
-    python src/camera_face_match.py
-
-Press 'q' to quit.
-"""
 
 from __future__ import annotations
 
@@ -26,7 +16,7 @@ SUPPORTED_EXTS = {".jpg", ".jpeg", ".png", ".bmp"}
 
 
 def load_known_faces(known_dir: Path) -> Tuple[List[np.ndarray], List[str]]:
-    """Load known face encodings and names from image files."""
+
     encodings: List[np.ndarray] = []
     names: List[str] = []
 
@@ -53,7 +43,6 @@ def camera_face_match() -> None:
     known_encodings, known_names = load_known_faces(KNOWN_DIR)
     if not known_encodings:
         print(f"No known faces loaded from: {KNOWN_DIR}")
-        print("Add files like: data/known_faces/Alice.jpg")
         sys.exit(1)
 
     cap = cv2.VideoCapture(0)
@@ -112,6 +101,6 @@ def camera_face_match() -> None:
         cap.release()
         cv2.destroyAllWindows()
 
-
+dirk656/RoboAutoTask
 if __name__ == "__main__":
     camera_face_match()
