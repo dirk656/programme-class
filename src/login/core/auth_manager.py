@@ -1,5 +1,5 @@
 # core/auth_manager.py
-from .db_manager import DB_PATH
+from src.login.core.db_manager import DB_PATH
 import sqlite3
 
 

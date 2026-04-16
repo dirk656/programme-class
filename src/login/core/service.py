@@ -1,4 +1,4 @@
-from core.db_manager import (
+from .db_manager import (
     add_sign_record,
     get_all_sign_records,
     get_my_sign_records

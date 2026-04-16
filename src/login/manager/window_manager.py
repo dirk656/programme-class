@@ -1,4 +1,4 @@
-from manager.ui_manager import UIManager
+from src.login.manager.ui_manager import UIManager
 
 class WindowManager:
     _instance = None

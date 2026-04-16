@@ -1,12 +1,9 @@
-#ui/style1/register_window.py
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox
 )
 from PyQt5.QtCore import Qt
-from config.settings import COLOR_BACKGROUND
-from manager.style_manager import get_global_style
-from core.db_manager import add_user
+from src.login.core.db_manager import add_user
 
 class RegisterWindow(QMainWindow):
     def __init__(self):
@@ -16,11 +13,22 @@ class RegisterWindow(QMainWindow):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setStyleSheet(get_global_style())
+        
+        # 直接写死全局样式，不再引用style_manager
+        self.setStyleSheet("""
+            QWidget {
+                font-family: "Microsoft YaHei UI", "Segoe UI", Arial, sans-serif;
+                font-size: 14px;
+                color: #ffffff;
+                background-color: #202020;
+            }
+        """)
+        
         self.drag_pos = None
 
         central = QWidget()
-        central.setStyleSheet(f"background:{COLOR_BACKGROUND};border-radius:10px;")
+        # 直接写死背景色，不再引用settings
+        central.setStyleSheet("background:#202020;border-radius:10px;")
         self.setCentralWidget(central)
         layout = QVBoxLayout(central)
         layout.setContentsMargins(40,40,40,40)
