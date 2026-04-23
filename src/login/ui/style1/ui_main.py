@@ -1,5 +1,6 @@
 import sys
 import cv2
+import time
 from PyQt5.QtWidgets import (
     QMainWindow, QTableWidgetItem, QWidget, QMessageBox, QApplication
 )
@@ -19,6 +20,8 @@ class CheckInPage(QWidget):
         super().__init__(parent)
         self.camera_thread = None
         self.parent_window = parent
+        self.last_unknown_alert_ts = 0.0
+        self.unknown_alert_cooldown = 3.0
 
     # 所有控件通过 self.parent().render 访问
     @property
@@ -49,7 +52,16 @@ class CheckInPage(QWidget):
 
     def handle_recognize(self, name):
         ui = self.ui
-        if not name or name == "你是个嘚儿": return
+        if not name or name == "你是个嘚儿":
+            return
+
+        if name == "Unknown":
+            now = time.time()
+            if now - self.last_unknown_alert_ts >= self.unknown_alert_cooldown:
+                self.last_unknown_alert_ts = now
+                QMessageBox.warning(self, "未知人脸", "未知人脸，请先进行人脸录入")
+            return
+
         try:
             if "_" in name:
                 real_name, student_username = name.split("_", 1)
@@ -66,6 +78,8 @@ class CheckInPage(QWidget):
         ui = self.ui
         QMessageBox.information(self, "录入成功", f"{name}的人脸数据已录入1张！\n可进行签到识别")
         self.stop_camera()
+        ui.student_username_input.clear()
+        ui.name_input.clear()
         ui.start_checkin_btn.setEnabled(True)
         ui.register_btn.setEnabled(True)
 
@@ -73,6 +87,8 @@ class CheckInPage(QWidget):
         ui = self.ui
         QMessageBox.warning(self, "重复录入", f"检测到该人脸已存在（{matched_name}），请勿重复录入人脸")
         self.stop_camera()
+        ui.student_username_input.clear()
+        ui.name_input.clear()
         ui.start_checkin_btn.setEnabled(True)
         ui.register_btn.setEnabled(True)
 
