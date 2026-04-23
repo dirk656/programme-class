@@ -15,7 +15,7 @@ def init_db():
         role TEXT NOT NULL DEFAULT 'student'
     )''')
 
-    # 👇 只加这一段
+
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS sign_records (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -147,4 +147,4 @@ if __name__ == "__main__":
     init_db()
     show_all_users()
     # reset_password("admin", "123456")
-    # delete_user("student1")
+    # delete_user("student2")
