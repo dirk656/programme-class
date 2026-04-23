@@ -9,6 +9,7 @@ class CameraThread(QThread):
     frame_ready = pyqtSignal(np.ndarray)
     recognize_result = pyqtSignal(str)
     register_done = pyqtSignal(str)
+    register_duplicate = pyqtSignal(str)
 
     def __init__(self, mode="checkin", name="", parent=None):
         super().__init__(parent)
@@ -48,6 +49,12 @@ class CameraThread(QThread):
             elif self.mode == "register":
                 if self.register_count < 1:
                     if self.frame_index % self.register_interval == 0:
+                        # 录入前先与已有人脸库比对，命中则阻止重复录入
+                        duplicated_name = face_engine.recognize_single_frame(frame, draw_box=False)
+                        if duplicated_name and duplicated_name != "Unknown":
+                            self.register_duplicate.emit(duplicated_name)
+                            break
+
                         if face_engine.save_face(self.name, frame):
                             self.register_count += 1
 

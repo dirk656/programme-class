@@ -69,6 +69,13 @@ class CheckInPage(QWidget):
         ui.start_checkin_btn.setEnabled(True)
         ui.register_btn.setEnabled(True)
 
+    def handle_register_duplicate(self, matched_name):
+        ui = self.ui
+        QMessageBox.warning(self, "重复录入", f"检测到该人脸已存在（{matched_name}），请勿重复录入人脸")
+        self.stop_camera()
+        ui.start_checkin_btn.setEnabled(True)
+        ui.register_btn.setEnabled(True)
+
     def start_checkin(self):
         ui = self.ui
         self.stop_camera()
@@ -93,6 +100,7 @@ class CheckInPage(QWidget):
         self.camera_thread = CameraThread(mode="register", name=save_name)
         self.camera_thread.frame_ready.connect(self.update_camera_frame)
         self.camera_thread.register_done.connect(self.handle_register_done)
+        self.camera_thread.register_duplicate.connect(self.handle_register_duplicate)
         self.camera_thread.start()
 
         ui.start_checkin_btn.setEnabled(False)
