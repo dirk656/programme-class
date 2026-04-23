@@ -19,8 +19,15 @@ class CustomTitleRender(QWidget):
         title_layout.setContentsMargins(20, 10, 20, 15)
         title_layout.setSpacing(10)
 
+        # ========== 【左边标题文字：加上无边框+透明背景】==========
         self.title_label = QLabel(title)
-        self.title_label.setStyleSheet("color: #303133; font-size: 18px; font-weight: bold;")
+        self.title_label.setStyleSheet("""
+            color: #303133;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            background-color: transparent;
+        """)
         title_layout.addWidget(self.title_label)
         title_layout.addStretch()
 
@@ -32,6 +39,8 @@ class CustomTitleRender(QWidget):
                 font-size: 16px;
                 text-align: center;
                 padding-top: 4px;
+                border: none;
+                background-color: transparent;
             }
             QLabel:hover {
                 background-color:#fef0f0;
@@ -49,6 +58,8 @@ class CustomTitleRender(QWidget):
                 color: #606266;
                 font-size: 24px;
                 text-align: center;
+                border: none;
+                background-color: transparent;
             }
             QLabel:hover {
                 background-color: #E4E7ED;
@@ -66,6 +77,8 @@ class CustomTitleRender(QWidget):
                 color: #606266;
                 font-size: 24px;
                 text-align: center;
+                border: none;
+                background-color: transparent;
             }
             QLabel:hover {
                 background-color: #E4E7ED;
@@ -83,6 +96,8 @@ class CustomTitleRender(QWidget):
                 color: #606266;
                 font-size: 24px;
                 text-align: center;
+                border: none;
+                background-color: transparent;
             }
             QLabel:hover {
                 background-color: #f56c6c;
