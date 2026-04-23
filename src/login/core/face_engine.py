@@ -18,6 +18,45 @@ known_encodings = []
 known_names = []
 _faces_loaded = False
 
+def _normalize_face_image(frame):
+    """把任意摄像头帧规范成 face_recognition 可接受的 8bit RGB/gray。"""
+    if frame is None:
+        return None
+
+    frame = np.asarray(frame)
+    if frame.size == 0:
+        return None
+
+    if frame.dtype != np.uint8:
+        # 常见浮点帧是 0~1 区间，先放大到 0~255 再转 uint8。
+        if np.issubdtype(frame.dtype, np.floating):
+            if frame.max(initial=0) <= 1.0:
+                frame = frame * 255.0
+        frame = np.clip(frame, 0, 255).astype(np.uint8)
+
+    if frame.ndim == 2:
+        if frame.shape[0] == 0 or frame.shape[1] == 0:
+            return None
+        return np.require(frame, dtype=np.uint8, requirements=["C_CONTIGUOUS"])
+
+    if frame.ndim != 3:
+        return None
+
+    if frame.shape[0] == 0 or frame.shape[1] == 0:
+        return None
+
+    channels = frame.shape[2]
+    if channels == 3:
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    elif channels == 4:
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGRA2RGB)
+    elif channels == 1:
+        rgb = frame[:, :, 0]
+    else:
+        return None
+
+    return np.require(rgb, dtype=np.uint8, requirements=["C_CONTIGUOUS"])
+
 def load_data():
     """包装 load_faces_data，实现数据缓存避免重复加载"""
     global known_encodings, known_names, _faces_loaded
@@ -38,10 +77,12 @@ def recognize_single_frame(frame, draw_box=True):
 
     # 用缩小图片的方式加快识别速度
     small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
-    rgb_small = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
+    face_input = _normalize_face_image(small_frame)
+    if face_input is None:
+        return None
 
-    face_locations = face_recognition.face_locations(rgb_small)
-    face_encodings = face_recognition.face_encodings(rgb_small, face_locations)
+    face_locations = face_recognition.face_locations(face_input)
+    face_encodings = face_recognition.face_encodings(face_input, face_locations)
 
     detected_name = None
 
@@ -83,12 +124,34 @@ def recognize_single_frame(frame, draw_box=True):
 def save_face(username, frame):
     """保存人脸到 known_faces 根目录并更新缓存"""
     path = USER_FACE_DIR / f"{username}.jpg"
-    cv2.imwrite(str(path), frame)
-    
-    # 获取新图片的编码并追加到缓存
-    image = face_recognition.load_image_file(str(path))
-    face_enc = face_recognition.face_encodings(image)
-    if face_enc:
-        known_encodings.append(face_enc[0])
-        known_names.append(username)
+    face_image = _normalize_face_image(frame)
+    if face_image is None:
+        shape = getattr(frame, "shape", None)
+        dtype = getattr(frame, "dtype", None)
+        print(f"人脸图像无效 {username}: shape={shape}, dtype={dtype}")
+        return False
+
+    # 保存时统一写成 BGR 三通道，避免部分后端生成异常格式文件。
+    save_image = face_image
+    if face_image.ndim == 3:
+        save_image = cv2.cvtColor(face_image, cv2.COLOR_RGB2BGR)
+
+    if not cv2.imwrite(str(path), save_image):
+        return False
+
+    try:
+        face_enc = face_recognition.face_encodings(face_image)
+    except RuntimeError as e:
+        channels = 1 if face_image.ndim == 2 else face_image.shape[2]
+        print(
+            f"人脸编码失败 {username}: {e}; "
+            f"shape={face_image.shape}, dtype={face_image.dtype}, channels={channels}"
+        )
+        return False
+
+    if not face_enc:
+        return False
+
+    known_encodings.append(face_enc[0])
+    known_names.append(username)
     return True
