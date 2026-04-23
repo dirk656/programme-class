@@ -70,13 +70,12 @@ def load_data():
     known_names.extend(names)
     _faces_loaded = True
 
-def recognize_single_frame(frame, draw_box=True):
+def recognize_single_frame(frame, draw_box=True, tolerance=0.6, scale=0.25):
     """适配单帧画面的人脸匹配 (代替原 camera_face_match 的死循环模式)"""
-    if not known_encodings:
-        return None
-
     # 用缩小图片的方式加快识别速度
-    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+    if scale <= 0:
+        scale = 0.25
+    small_frame = cv2.resize(frame, (0, 0), fx=scale, fy=scale)
     face_input = _normalize_face_image(small_frame)
     if face_input is None:
         return None
@@ -85,6 +84,7 @@ def recognize_single_frame(frame, draw_box=True):
     face_encodings = face_recognition.face_encodings(face_input, face_locations)
 
     detected_name = None
+    unknown_detected = False
 
     for (top, right, bottom, left), face_enc in zip(face_locations, face_encodings):
         name = "Unknown"
@@ -94,18 +94,21 @@ def recognize_single_frame(frame, draw_box=True):
         if len(distances) > 0:
             best_idx = int(np.argmin(distances))
             score_text = f"{distances[best_idx]:.3f}"
-            if distances[best_idx] <= 0.6:  # 常规容差值
+            if distances[best_idx] <= tolerance:
                 name = known_names[best_idx]
-                # 记录找到的最优名字返回
-                if detected_name is None or name != "Unknown":
-                    detected_name = name
+                detected_name = name
+            else:
+                unknown_detected = True
+        else:
+            # 没有已知人脸可比对时，只要检测到人脸就按 Unknown 处理。
+            unknown_detected = True
 
         if draw_box:
             # 还原缩放比例，绘制在原帧上
-            top = int(top / 0.25)
-            right = int(right / 0.25)
-            bottom = int(bottom / 0.25)
-            left = int(left / 0.25)
+            top = int(top / scale)
+            right = int(right / scale)
+            bottom = int(bottom / scale)
+            left = int(left / scale)
 
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 200, 0), 2)
             cv2.rectangle(frame, (left, bottom - 28), (right, bottom), (0, 200, 0), cv2.FILLED)
@@ -119,7 +122,13 @@ def recognize_single_frame(frame, draw_box=True):
                 1,
             )
 
-    return detected_name
+    if detected_name:
+        return detected_name
+
+    if unknown_detected or len(face_encodings) > 0:
+        return "Unknown"
+
+    return None
 
 def save_face(username, frame):
     """保存人脸到 known_faces 根目录并更新缓存"""
