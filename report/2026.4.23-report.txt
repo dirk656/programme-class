@@ -1,28 +1,13 @@
-# core/camera_worker.py
-
-import cv2
-import numpy as np
-from PyQt5.QtCore import QThread, pyqtSignal
-from . import face_engine
-
-class CameraThread(QThread):
-    frame_ready = pyqtSignal(np.ndarray)
-    recognize_result = pyqtSignal(str)
-    register_done = pyqtSignal(str)
-
-    def __init__(self, mode="checkin", name="", parent=None):
-        super().__init__(parent)
-        self.mode = mode
-        self.name = name
-        self.running = False
-        self.capture = None
-        self.register_count = 0
-        self.frame_index = 0
-        self.recognize_interval = 3
-        self.register_interval = 10
-
-    
-    def run(self):
+1、项目名称：人脸识别签到系统
+2、代码所属文件名：
+camera_worker
+face_engine 
+3、功能
+实现人脸识别功能
+前后端识别窗口交互
+4、代码（关键变量、函数需附简单的注释）：
+1.camera_worker：改为调用后端识别的run函数进行识别和记录
+def run(self):
    
         if self.capture is None or not self.capture.isOpened():
             self.capture = cv2.VideoCapture(0)
@@ -39,7 +24,7 @@ class CameraThread(QThread):
 
             if self.mode == "checkin":
                 if self.frame_index % self.recognize_interval == 0:
-                    name = face_engine.recognize_single_frame(frame, draw_box=False)
+                    name = face_engine.recognize_single_frame(frame, draw_box=True)
                     if name and name != "Unknown":
                         self.recognize_result.emit(name)
                     
@@ -59,6 +44,11 @@ class CameraThread(QThread):
 
         self.capture.release()
         self.capture = None
+2.title_bar:增加点击放大和最小化按钮可以调整窗口大小的功能
+ self.min_label.mousePressEvent = lambda e: _host_window().showMinimized()
+        self.max_label.mousePressEvent = lambda e: _host_window().toggle_maximize() if hasattr(_host_window(), "toggle_maximize") else _host_window().showMaximized()
+        self.close_label.mousePressEvent = lambda e: _host_window().close()
 
-    def stop(self):
-        self.running = False
+3.face_engine :在程序运行过程中发现开启识别窗口速度很慢，修改图片的分辨率来加快软件反应速度
+ small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+    face_input = _normalize_face_image(small_frame)
