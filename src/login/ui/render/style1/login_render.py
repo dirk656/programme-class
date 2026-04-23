@@ -132,8 +132,14 @@ class LoginRender:
 
         main_layout.addWidget(content)
 
+        # 光标自动放在用户名输入框
+        self.username_input.setFocus()
+
     def bind_events(self, login_click, reset_click, register_click):
         """绑定事件，由业务层传入"""
         self.login_btn.clicked.connect(login_click)
         self.reset_btn.clicked.connect(reset_click)
         self.register_btn.clicked.connect(register_click)
+        # 用户名行enter跳转 和 密码行enter触发登录
+        self.username_input.returnPressed.connect(self.password_input.setFocus) 
+        self.password_input.returnPressed.connect(login_click)

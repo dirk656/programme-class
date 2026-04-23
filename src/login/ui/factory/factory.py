@@ -1,5 +1,5 @@
 # ====================== 皮肤切换开关 ======================
-SKIN = "style2"
+SKIN = "style2"  # 可选 "style1" 或 "style2"
 
 class UIFactory:
 
