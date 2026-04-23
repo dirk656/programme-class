@@ -1,4 +1,3 @@
-# ui/render/style2/login_render.py
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QLineEdit, QPushButton
@@ -23,7 +22,7 @@ class LoginRender:
                 font-size: 14px;
                 color: #303133;
                 background-color: #F0F2F5;
-                border: none;  /* 全局去掉默认黑边框 */
+                border: none;
             }
         """)
 
@@ -32,7 +31,7 @@ class LoginRender:
             background-color: #FFFFFF;
             border-radius: 12px;
             border: 1px solid #E4E7ED;
-            border: none;  /* 去掉容器自身黑框 */
+            border: none;
         """)
         self.win.setCentralWidget(central_widget)
 
@@ -49,7 +48,7 @@ class LoginRender:
         main_layout.addWidget(divider)
 
         content = QWidget()
-        content.setStyleSheet("border: none;")  # 去掉内容区黑框
+        content.setStyleSheet("border: none;")
         content_layout = QVBoxLayout(content)
         content_layout.setContentsMargins(100, 50, 100, 50)
         content_layout.setSpacing(30)
@@ -62,7 +61,7 @@ class LoginRender:
 
         # ===================== 用户名输入 =====================
         user_widget = QWidget()
-        user_widget.setStyleSheet("border: none;")  # 去掉行黑框
+        user_widget.setStyleSheet("border: none;")
         user_layout = QHBoxLayout(user_widget)
         user_layout.setSpacing(15)
 
@@ -80,7 +79,7 @@ class LoginRender:
                 padding:12px 15px; 
                 border:1px solid #DCDFE6; 
                 border-radius:8px;
-                border: none;  /* 去掉输入框默认黑边 */
+                border: none;
             }
             QLineEdit:focus { 
                 border:1px solid #409EFF; 
@@ -175,15 +174,14 @@ class LoginRender:
         """)
         content_layout.addWidget(self.register_btn, alignment=Qt.AlignCenter)
 
-        main_layout.addWidget(content)
+        # ===================== 修复：垂直拉伸 =====================
+        main_layout.addWidget(content, stretch=1)
 
-        #打开时光标自动放在用户名上
         self.username_input.setFocus()
 
     def bind_events(self, login_click, reset_click, register_click):
         self.login_btn.clicked.connect(login_click)
         self.reset_btn.clicked.connect(reset_click)
         self.register_btn.clicked.connect(register_click)
-        # 用户名行enter跳转 和 密码行enter触发登录
         self.username_input.returnPressed.connect(self.password_input.setFocus)
         self.password_input.returnPressed.connect(login_click)

@@ -219,7 +219,10 @@ class FaceRecognitionCheckIn(QMainWindow):
         self.setCursor(Qt.ArrowCursor)
 
     def toggle_maximize(self):
-        self.showNormal() if self.isMaximized() else self.showMaximized()
+        if self.isMaximized():
+            self.showNormal()
+        else:
+            self.showMaximized()
 
     def _get_resize_edge(self, pos):
         r = self.rect()

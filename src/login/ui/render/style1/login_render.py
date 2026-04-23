@@ -130,7 +130,8 @@ class LoginRender:
         """)
         content_layout.addWidget(self.register_btn, alignment=Qt.AlignCenter)
 
-        main_layout.addWidget(content)
+        # ===================== 修复：最大化全屏拉伸 =====================
+        main_layout.addWidget(content, stretch=1)
 
         # 光标自动放在用户名输入框
         self.username_input.setFocus()

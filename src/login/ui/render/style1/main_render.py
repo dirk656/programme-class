@@ -1,3 +1,4 @@
+# style1\main_render.py
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QTableWidget, QLabel,

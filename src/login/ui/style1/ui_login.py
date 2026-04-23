@@ -29,6 +29,14 @@ class LoginWindow(QMainWindow, BaseLoginWindow):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
 
+    # ===================== 【新增：修复最大化全屏拉伸】=====================
+    def toggle_maximize(self):
+        if self.isMaximized():
+            self.showNormal()
+        else:
+            self.showMaximized()
+    # ====================================================================
+
     def on_login_click(self):
         username = self.render.username_input.text().strip()
         password = self.render.password_input.text().strip()
