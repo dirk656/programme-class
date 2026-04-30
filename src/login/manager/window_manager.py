@@ -1,4 +1,5 @@
 from src.login.manager.ui_manager import UIManager
+from src.login.ui.factory.factory import skin_signal
 
 class WindowManager:
     _instance = None
@@ -9,6 +10,8 @@ class WindowManager:
             cls._instance.app = app
             cls._instance.login_win = None
             cls._instance.main_win = None
+            # 绑定皮肤切换信号：切皮肤就回到登录页
+            skin_signal.toggle.connect(cls._instance.show_login)
         return cls._instance
 
     def show_login(self):
@@ -20,7 +23,7 @@ class WindowManager:
     def show_main_by_role(self, username, role):
         print(f"[DEBUG] 登录成功 → 用户：{username} 角色：{role}")
 
-        # 1. 先关登录窗口（必须第一步）
+        # 1. 先关登录窗口
         if self.login_win:
             self.login_win.close()
             self.login_win.deleteLater()
@@ -32,12 +35,12 @@ class WindowManager:
         else:
             self.main_win = UIManager().create_student(username)
 
-        # 3. ✨ 强制显示 + 激活（这是你缺失的关键）
+        # 3. 强制显示激活
         self.main_win.show()
         self.main_win.raise_()
         self.main_win.activateWindow()
 
-        # 4. ✨ 强制刷新界面（防止界面卡住不绘制）
+        # 4. 强制刷新界面
         from PyQt5.QtWidgets import QApplication
         QApplication.processEvents()
 

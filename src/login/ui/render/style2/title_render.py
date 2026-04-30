@@ -19,7 +19,6 @@ class CustomTitleRender(QWidget):
         title_layout.setContentsMargins(20, 10, 20, 15)
         title_layout.setSpacing(10)
 
-        # ========== 【左边标题文字：加上无边框+透明背景】==========
         self.title_label = QLabel(title)
         self.title_label.setStyleSheet("""
             color: #303133;
@@ -30,6 +29,26 @@ class CustomTitleRender(QWidget):
         """)
         title_layout.addWidget(self.title_label)
         title_layout.addStretch()
+
+        # ===================== 皮肤按钮 =====================
+        self.skin_btn = QLabel("☀️")
+        self.skin_btn.setFixedSize(50, 50)
+        self.skin_btn.setStyleSheet("""
+            QLabel {
+                color: #303133;
+                font-size: 24px;
+                qproperty-alignment: AlignCenter;
+                background-color: transparent;
+                border: none;
+            }
+            QLabel:hover {
+                background-color: #E4E7ED;
+                border-radius: 5px;
+            }
+        """)
+        self.skin_btn.setCursor(Qt.PointingHandCursor)
+        title_layout.addWidget(self.skin_btn)
+        # ====================================================
 
         self.logout_label = QLabel("退出登录")
         self.logout_label.setFixedSize(80, 40)

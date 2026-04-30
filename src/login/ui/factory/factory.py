@@ -1,8 +1,30 @@
 # ====================== 皮肤切换开关 ======================
-SKIN = "style2"  # 可选 "style1" 或 "style2"
+from PyQt5.QtCore import QObject, pyqtSignal
+
+# 全局皮肤信号：点击切换后，通知所有窗口关闭
+class SkinSignal(QObject):
+    toggle = pyqtSignal()
+
+skin_signal = SkinSignal()
+SKIN = "style1"  # 默认皮肤
+
 
 class UIFactory:
 
+    @staticmethod
+    def get_skin():
+        global SKIN
+        return SKIN
+
+    @staticmethod
+    def toggle_skin():
+        global SKIN
+        # 切换：style1 ↔ style2
+        SKIN = "style2" if SKIN == "style1" else "style1"
+        # 发送信号 → 所有窗口关闭
+        skin_signal.toggle.emit()
+
+    # ------------------- 下面你原来的代码完全不动 -------------------
     @staticmethod
     def create_login_window():
         if SKIN == "style1":
